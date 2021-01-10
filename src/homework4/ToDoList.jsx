@@ -1,20 +1,21 @@
 import React, { Component, Fragment } from 'react';
 import stayls from './staylToDo.module.css';
-import { Container, Row, Col, Button, InputGroup, Card, ListGroup, ListGroupItem} from 'react-bootstrap';
+import { Container, Row, Col, Button, InputGroup, Card, ListGroup, ListGroupItem, Modal, Form } from 'react-bootstrap';
+
 
 class ToDoList extends Component {
 
-    state = {
-        newTaskTitle: '',
-        newTaskDescription: '',
-        newTaskDate: '',
-        newTaskCreated: '',
-        newTaskStatus: '',
-        tasks: [
-            { title: 'Title', description: 'Description', date: 'Date', created: 'CreaTed', status: 'Status' }
-        ],
-        checkboxTask: []
-    };
+    // state = {
+    //     newTaskTitle: '',
+    //     newTaskDescription: '',
+    //     newTaskDate: '',
+    //     newTaskCreated: '',
+    //     newTaskStatus: '',
+    //     tasks: [
+    //         { title: 'Title', description: 'Description', date: 'Date', created: 'CreaTed', status: 'Status' }
+    //     ],
+    //     checkboxTask: []
+    // };
 
     ////////
 
@@ -110,7 +111,7 @@ class ToDoList extends Component {
 
         }
 
-        else{
+        else {
             alert("Please fill in all the boxes");
         }
 
@@ -140,6 +141,28 @@ class ToDoList extends Component {
     //////
 
 
+    editClick = (event) => {
+        <Modal.Dialog>
+            <Modal.Header closeButton>
+                <Modal.Title>Modal title</Modal.Title>
+            </Modal.Header>
+
+            <Modal.Body>
+                <p>Modal body text goes here.</p>
+            </Modal.Body>
+
+            <Modal.Footer>
+                <Button variant="secondary">Close</Button>
+                <Button variant="primary">Save changes</Button>
+            </Modal.Footer>
+        </Modal.Dialog>
+    }
+
+
+
+    //////
+
+
     tasksCycle = () => {
 
         let dateYear = new Date();
@@ -159,7 +182,7 @@ class ToDoList extends Component {
                     <ListGroupItem>{el.status}</ListGroupItem>
                 </ListGroup>
                 <Button className={stayls.taskButton} variant="outline-success">FINISH</Button>{' '}
-                <Button className={stayls.taskButton} variant="outline-warning">EDIT</Button>{' '}
+                <Button className={stayls.taskButton} variant="outline-warning" onClick={this.editClick}>EDIT</Button>{' '}
                 <Button className={stayls.taskButton} variant="outline-danger" onClick={this.remowTask}>REMOW</Button>{' '}
             </Card>
         })
@@ -170,7 +193,8 @@ class ToDoList extends Component {
     render() {
         let { tasks } = this.state;
 
-        return (<div>
+        return (
+        <div>
             <h1 className={stayls.toDoListTitle}>TODO LIST</h1>
             <div className={stayls.tasksInputAndButton}>
 
