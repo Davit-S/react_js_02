@@ -1,21 +1,18 @@
 import React, { Component, Fragment } from 'react';
 import stayls from './staylToDo.module.css';
-import { Container, Row, Col, Button, InputGroup, Card, ListGroup, ListGroupItem, Modal, Form } from 'react-bootstrap';
-
+import { Container, Row, Col, Button, InputGroup, Card } from 'react-bootstrap';
+import idGenerator from "./helpers/idGenerator"
 
 class ToDoList extends Component {
 
-    // state = {
-    //     newTaskTitle: '',
-    //     newTaskDescription: '',
-    //     newTaskDate: '',
-    //     newTaskCreated: '',
-    //     newTaskStatus: '',
-    //     tasks: [
-    //         { title: 'Title', description: 'Description', date: 'Date', created: 'CreaTed', status: 'Status' }
-    //     ],
-    //     checkboxTask: []
-    // };
+    state = {
+        newTaskTitle: '',
+        editTaskTitle: '',
+        hidden: false,
+        editHidden: true,
+        tasks: [],
+        checkboxTask: new Set()
+    };
 
     ////////
 
@@ -31,32 +28,11 @@ class ToDoList extends Component {
             return
         };
 
-
-        if (inputClassName === stayls.inputTaskDescription) {
+        if (inputClassName === stayls.editinputTitle) {
             this.setState({
-                newTaskDescription: event.target.value
+                editTaskTitle: event.target.value
             });
-            return
-        };
 
-        if (inputClassName === stayls.inputTaskDate) {
-            this.setState({
-                newTaskDate: event.target.value
-            });
-            return
-        };
-
-        if (inputClassName === stayls.inputTaskCreated) {
-            this.setState({
-                newTaskCreated: event.target.value
-            });
-            return
-        };
-
-        if (inputClassName === stayls.newTaskStatus) {
-            this.setState({
-                newTaskStatus: event.target.value
-            });
             return
         };
 
@@ -64,22 +40,24 @@ class ToDoList extends Component {
 
     ////////
 
-    pushCheckboxTasks = (event) => {
 
-        let checkboxElement = event.target.closest('div');
-        let arrayCheckboxElements = this.state.checkboxTask;
+    pushCheckboxTasks = (taskId) => {
 
-        if (arrayCheckboxElements.includes(checkboxElement)) {
-            arrayCheckboxElements.splice(checkboxElement, 0);
+        let newCheckboxTask = new Set(this.state.checkboxTask);
+
+        if (newCheckboxTask.has(taskId)) {
+            newCheckboxTask.delete(taskId)
         }
         else {
-            arrayCheckboxElements.push(checkboxElement);
-        };
-
+            newCheckboxTask.add(taskId)
+        }
 
         this.setState({
-            checkboxTask: arrayCheckboxElements
+            checkboxTask: newCheckboxTask
         });
+
+        console.log(newCheckboxTask);   //սույն զանգվածի և ներքոգրյալ զանգվածի արժեքները տարբեր են, հասկանալ պատճառը?
+        console.log(this.state.checkboxTask);
 
     };
 
@@ -87,15 +65,14 @@ class ToDoList extends Component {
 
     newTaskPush = () => {
 
-        if (this.state.newTaskTitle && this.state.newTaskDescription && this.state.newTaskCreated && this.state.newTaskStatus) {
+        if (this.state.newTaskTitle) {
             let tasks = [...this.state.tasks];
 
             let newObject = {
+                _id: idGenerator(),
                 title: this.state.newTaskTitle,
-                description: this.state.newTaskDescription,
-                date: this.state.newTaskDate,
-                created: this.state.newTaskCreated,
-                status: this.state.newTaskStatus
+                hidden: this.state.hidden,
+                editHidden: this.state.editHidden
             };
 
             tasks.push(newObject);
@@ -103,37 +80,47 @@ class ToDoList extends Component {
             this.setState({
                 tasks,
                 newTaskTitle: '',
-                newTaskDescription: '',
-                newTaskDate: '',
-                newTaskCreated: '',
-                newTaskStatus: ''
             });
 
         }
 
         else {
-            alert("Please fill in all the boxes");
+            alert("Please fill in the box");
         }
 
     };
 
     ////////
 
-    remowTask = (event) => {
-        let element = event.target.closest('div');
+    remowTask = (taskId) => {
+        let filterTask = this.state.tasks.filter((element) => {
+            if (element._id === taskId) {
+                return false
+            }
+            else { return true }
+        })
 
-        element.remove();
+        this.setState({
+            tasks: filterTask
+        })
     }
 
     ////////
 
     remoweCheckboxTask = (event) => {
-        this.state.checkboxTask.forEach((elem, index) => {
-            elem.remove();
+
+        let { tasks, checkboxTask } = this.state
+
+        let newTasks = tasks.filter((elem) => {
+            if (checkboxTask.has(elem._id)) {
+                return false
+            }
+            else { return true }
         });
 
         this.setState({
-            checkboxTask: []
+            tasks: newTasks,
+            checkboxTask: new Set()
         });
 
     };
@@ -141,26 +128,72 @@ class ToDoList extends Component {
     //////
 
 
-    editClick = (event) => {
-        <Modal.Dialog>
-            <Modal.Header closeButton>
-                <Modal.Title>Modal title</Modal.Title>
-            </Modal.Header>
+    editClick = (taskId, buttonType) => {
+        let { tasks } = this.state;
+        let booleanOne;
+        let booleanTwo;
 
-            <Modal.Body>
-                <p>Modal body text goes here.</p>
-            </Modal.Body>
+        if (buttonType === "EDIT") {
+            booleanOne = true;
+            booleanTwo = false
+        };
 
-            <Modal.Footer>
-                <Button variant="secondary">Close</Button>
-                <Button variant="primary">Save changes</Button>
-            </Modal.Footer>
-        </Modal.Dialog>
+        if (buttonType === "CANCLE") {
+            booleanOne = false;
+            booleanTwo = true
+        };
+
+        for (let i = 0; i < tasks.length; i++) {
+            if (tasks[i]._id === taskId) {
+                tasks[i].hidden = booleanOne;
+                tasks[i].editHidden = booleanTwo;
+                this.setState({
+                    tasks
+                })  //ընդհանրապես ընդունված է if-ի ներսում setState կանչելը?
+
+                return
+            }
+        }
+
+
     }
 
+    saveEditTask = (taskId) => {
 
+        if (this.state.editTaskTitle) {
+
+
+            let { tasks } = this.state;
+
+            tasks.forEach((elem) => {
+                if (elem._id === taskId) {
+                    elem.title = this.state.editTaskTitle
+                }
+            })
+
+            this.setState({
+                tasks,
+                editTaskTitle: '',
+            });
+
+            this.editClick(taskId, "CANCLE");
+
+        }
+        else { alert("Please fill in the box") }
+
+    }
 
     //////
+
+
+    handleKeyDown = (event) => {
+        if (event.key === "Enter") {
+            this.newTaskPush();
+        }
+    };
+
+
+    /////
 
 
     tasksCycle = () => {
@@ -168,23 +201,54 @@ class ToDoList extends Component {
         let dateYear = new Date();
 
         return this.state.tasks.map((el, index) => {
-            return <Card className={stayls.taskCard} style={{ width: '18rem' }} key={index}>
-                <input type='checkbox' onClick={this.pushCheckboxTasks} />
-                <Card.Body>
-                    <Card.Title>{el.title}</Card.Title>
-                    <Card.Text>
-                        {el.description}
-                    </Card.Text>
-                </Card.Body>
-                <ListGroup className="list-group-flush">
-                    <ListGroupItem> {dateYear.getDate()} {dateYear.getMonth() + '1'} {dateYear.getFullYear()} </ListGroupItem>
-                    <ListGroupItem>{el.created}</ListGroupItem>
-                    <ListGroupItem>{el.status}</ListGroupItem>
-                </ListGroup>
-                <Button className={stayls.taskButton} variant="outline-success">FINISH</Button>{' '}
-                <Button className={stayls.taskButton} variant="outline-warning" onClick={this.editClick}>EDIT</Button>{' '}
-                <Button className={stayls.taskButton} variant="outline-danger" onClick={this.remowTask}>REMOW</Button>{' '}
-            </Card>
+            return <Col className={stayls.colCard}
+                key={el._id}
+                xs={12}
+                sm={6}
+                md={5}
+                lg={4}
+                xl={3}
+            >
+                <Card style={{ width: '18rem' }}>
+                    <input type='checkbox' onChange={(event) => this.pushCheckboxTasks(el._id)} />
+
+                    <Card.Body hidden={el.editHidden}>
+                        <div>
+                            <input
+                                className={stayls.editinputTitle}
+                                onChange={this.changeInputValue}
+                                type="text"
+                            />
+
+                            <Button variant="secondary"
+                                className={stayls.taskButton}
+                                onClick={(event) => { this.editClick(el._id, "CANCLE") }}
+                            > CANCLE </Button>
+                            <Button variant="primary"
+                                className={stayls.taskButton}
+                                onClick={(event) => { this.saveEditTask(el._id) }}
+                            > SAVE </Button>
+                        </div>
+                    </Card.Body>
+
+                    <Card.Body hidden={el.hidden}>
+                        <Card.Title>{el.title}</Card.Title>
+                        <Card.Text>
+                            {dateYear.getDate()} {dateYear.getMonth() + '1'} {dateYear.getFullYear()}
+                        </Card.Text>
+                        <Button variant="warning"
+                            onClick={(event) => { this.editClick(el._id, "EDIT") }}
+                            className={stayls.taskButton}
+                        > EDIT </Button>
+                        <Button variant="danger"
+                            onClick={(event) => { this.remowTask(el._id) }}
+                            disabled={!!this.state.checkboxTask.size}
+                            className={stayls.taskButton}
+                        > REMOW </Button>
+                    </Card.Body>
+                </Card>
+            </Col>
+
         })
     }
 
@@ -194,46 +258,34 @@ class ToDoList extends Component {
         let { tasks } = this.state;
 
         return (
-        <div>
-            <h1 className={stayls.toDoListTitle}>TODO LIST</h1>
-            <div className={stayls.tasksInputAndButton}>
+            <div>
+                <h1 className={stayls.toDoListTitle}>TODO LIST</h1>
+                <div className={stayls.tasksInputAndButton}>
 
-                <input
-                    className={stayls.inputTaskTitle}
-                    type="text"
-                    value={this.state.newTaskTitle}
-                    onChange={this.changeInputValue}
-                />
-                <input
-                    className={stayls.inputTaskDescription}
-                    type="text"
-                    value={this.state.newTaskDescription}
-                    onChange={this.changeInputValue}
-                />
-                <input
-                    className={stayls.inputTaskCreated}
-                    type="text"
-                    value={this.state.newTaskCreated}
-                    onChange={this.changeInputValue}
-                />
-                <input
-                    className={stayls.newTaskStatus}
-                    type="text"
-                    value={this.state.newTaskStatus}
-                    onChange={this.changeInputValue}
-                />
-                <InputGroup.Append className={stayls.addAndRemowButtons}>
-                    <Button className={stayls.addTaskButton} onClick={this.newTaskPush}>ADD TASK</Button>
-                    <Button className={stayls.remoweAllTasks} onClick={this.remoweCheckboxTask}>REMOWE TASKS</Button>
-                </InputGroup.Append>
+                    <input
+                        className={stayls.inputTaskTitle}
+                        type="text"
+                        value={this.state.newTaskTitle}
+                        onChange={this.changeInputValue}
+                        onKeyDown={this.handleKeyDown}
+                    />
 
+                    <InputGroup.Append className={stayls.addAndRemowButtons}>
+                        <Button className={stayls.addTaskButton} onClick={this.newTaskPush}>ADD TASK</Button>
+                        <Button className={stayls.remoweAllTasks}
+                            onClick={this.remoweCheckboxTask}
+                            disabled={!this.state.checkboxTask.size}>
+                            REMOWE TASKS
+                            </Button>
+                    </InputGroup.Append>
+
+                </div >
+                <Container>
+                    <Row className={stayls.cardsRow}>
+                        {this.tasksCycle()}
+                    </Row>
+                </Container>
             </div >
-            <Container>
-                <Row className={stayls.cardsRow}>
-                    <Col>{this.tasksCycle()} </Col>
-                </Row>
-            </Container>
-        </div >
 
         );
 
@@ -242,9 +294,3 @@ class ToDoList extends Component {
 }
 
 export default ToDoList;
-
-
-
-
-
-

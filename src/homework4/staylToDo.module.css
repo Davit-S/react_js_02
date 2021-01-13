@@ -28,10 +28,8 @@
 }
 
 .taskButton{
-    border-radius: 0% !important;
-    color: black !important;
-    width: 100% !important;
-    border: none !important;
+    color: white !important;
+    margin-right: 2%;
 }
 
 .addTaskButton{
@@ -43,21 +41,27 @@
     
 }
 
-.cardsRow{
-    justify-content: center;
-    text-align: center;
-    margin-top: 5%;
+
+.colCard{
+    margin: 1% !important;
+    padding: 0% !important;
 }
 
 .taskCard{
     background-color: aqua !important; 
-    float: left;
-    margin: 3%;
+    text-align: center;
 }
-
-
 
 .remoweAllTasks{
     border: solid red !important;
     background-color: red !important;
+}
+
+.editinputTitle, .editinputDescription, .editinputCreated, .editinputStatus{
+    margin-bottom: 5% !important;
+    border-left: solid rgb(238, 255, 0);
+    border-right: none;
+    border-top: none;
+    border-bottom: solid rgb(238, 255, 0);
+    width: 90% !important;
 }
