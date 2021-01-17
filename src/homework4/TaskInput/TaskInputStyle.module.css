@@ -1,0 +1,33 @@
+.tasksInputAndButton{
+    text-align: -webkit-center !important;
+}
+
+.addAndRemowButtons{
+    justify-content: flex-end !important;
+    padding-right: 15%;
+}
+
+.addTaskButton{
+    border: solid lime !important;
+    background-color: lime !important;
+    color: white;
+    width: auto;
+    margin-right: 1%;
+    
+}
+
+
+.remoweAllTasks{
+    border: solid red !important;
+    background-color: red !important;
+}
+
+
+.inputTaskTitle, .descriptionText{
+    border-left: solid aqua;
+    border-right: none;
+    border-top: none;
+    border-bottom: solid aqua;
+    width: 70% !important;
+    margin-bottom: 1% !important;
+}

@@ -1,0 +1,14 @@
+.taskButton{
+    color: white !important;
+    margin-right: 2%;
+}
+
+
+.editinputTitle, .editinputDescription{
+    margin-bottom: 5% !important;
+    border-left: solid rgb(238, 255, 0);
+    border-right: none;
+    border-top: none;
+    border-bottom: solid rgb(238, 255, 0);
+    width: 90% !important;
+}
