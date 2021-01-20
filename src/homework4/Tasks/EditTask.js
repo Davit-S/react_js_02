@@ -1,15 +1,11 @@
 import React, { Component } from 'react';
 import { Button, Modal, FormControl } from 'react-bootstrap';
-import idGenerator from "../helpers/idGenerator";
-import PropTypes from 'prop-types';
 
-
-
-export default class TaskInput extends Component {
+export default class EditTask extends Component {
 
     state = {
-        taskTitle: "",
-        taskDescription: "",
+        taskEditTitle: this.props.objectTask.title,
+        taskEditDescription: this.props.objectTask.description
     }
 
 
@@ -25,52 +21,20 @@ export default class TaskInput extends Component {
     };
 
 
-    newTaskPush = () => {
-        let newTitle = this.state.taskTitle.trim();
-        let newDescription = this.state.taskDescription.trim();
-
-        if (newTitle && newDescription) {
-
-            let newObject = {
-                _id: idGenerator(),
-                title: newTitle,
-                description: newDescription,
-            };
-
-            this.props.onTransfer(newObject);
-
-            this.setState({
-                taskTitle: "",
-                taskDescription: ""
-            });
-
-        }
-
-        else {
-            alert("Please fill in the box");
-        }
-
-    };
-
-
-    handleKeyDown = (event) => {
-        if (event.key === "Enter") {
-            this.newTaskPush();
-        }
-    };
-
     render() {
+
+        let { onToggleEditTask, onEditTaskTransfer } = this.props;
 
         return <Modal
             show={true}
-            onHide={this.props.onClose}
+            onHide={onToggleEditTask}
             size="lg"
             aria-labelledby="contained-modal-title-vcenter"
             centered
         >
             <Modal.Header closeButton>
                 <Modal.Title id="contained-modal-title-vcenter">
-                    ADD NEW TASK
+                    EDIT TASK
         </Modal.Title>
             </Modal.Header>
             <Modal.Body>
@@ -78,16 +42,18 @@ export default class TaskInput extends Component {
                 <FormControl
                     placeholder="Title"
                     onChange={this.changeInputValue}
-                    name='taskTitle'
+                    name='taskEditTitle'
                     onKeyPress={this.handleKeyDown}
                     className='mb-3'
+                    value={this.state.taskEditTitle}
                 />
                 <FormControl
                     placeholder="Description"
                     as="textarea"
                     rows={5}
-                    name='taskDescription'
+                    name='taskEditDescription'
                     onChange={this.changeInputValue}
+                    value={this.state.taskEditDescription}
                 />
 
             </Modal.Body>
@@ -95,13 +61,14 @@ export default class TaskInput extends Component {
 
             <Modal.Footer>
                 <Button
-                    onClick={this.newTaskPush}
+                    onClick={()=>{onEditTaskTransfer(this.props.objectTask._id, this.state.taskEditTitle, this.state.taskEditDescription)}}
                     variant='success'
                 >
-                    Add
+                    Save
             </Button>
                 <Button 
-                onClick={this.props.onClose}>
+                onClick={onToggleEditTask}
+                >
                     Cancel
                     </Button>
             </Modal.Footer>
@@ -110,6 +77,4 @@ export default class TaskInput extends Component {
     }
 }
 
-TaskInput.propTypes = {
-    onTransfer: PropTypes.func.isRequired
-}
+
