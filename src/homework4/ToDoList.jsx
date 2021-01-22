@@ -1,138 +1,84 @@
-import React, { Component, Fragment } from 'react';
-import stayls from './staylToDo.module.css';
-import { Container, Row, Col, Button, InputGroup, Card, ListGroup, ListGroupItem} from 'react-bootstrap';
+import React, { Component } from 'react';
+import styles from './stylesToDo.module.css';
+import { Container, Row, Col, Button } from 'react-bootstrap';
+import Tasks from "./Tasks/Tasks";
+import TaskInput from "../homework4/TaskInput/TaskInput";
+import Confirm from './Confirm';
+import EditTask from './Tasks/EditTask';
+
 
 class ToDoList extends Component {
 
     state = {
-        newTaskTitle: '',
-        newTaskDescription: '',
-        newTaskDate: '',
-        newTaskCreated: '',
-        newTaskStatus: '',
-        tasks: [
-            { title: 'Title', description: 'Description', date: 'Date', created: 'CreaTed', status: 'Status' }
-        ],
-        checkboxTask: []
+        showDeleteTasks: false,
+        showAddNewTask: false,
+        tasks: [],
+        checkboxTask: new Set(),
+        showEditTask: false,
+        editTaskObject: null
     };
+
 
     ////////
 
-    changeInputValue = (event) => {
+    pushCheckboxTasks = (taskId) => {
 
-        let inputClassName = event.target.classList[0];
+        let newCheckboxTask = new Set(this.state.checkboxTask);
 
-        if (inputClassName === stayls.inputTaskTitle) {
-            this.setState({
-                newTaskTitle: event.target.value
-            });
-
-            return
-        };
-
-
-        if (inputClassName === stayls.inputTaskDescription) {
-            this.setState({
-                newTaskDescription: event.target.value
-            });
-            return
-        };
-
-        if (inputClassName === stayls.inputTaskDate) {
-            this.setState({
-                newTaskDate: event.target.value
-            });
-            return
-        };
-
-        if (inputClassName === stayls.inputTaskCreated) {
-            this.setState({
-                newTaskCreated: event.target.value
-            });
-            return
-        };
-
-        if (inputClassName === stayls.newTaskStatus) {
-            this.setState({
-                newTaskStatus: event.target.value
-            });
-            return
-        };
-
-    };
-
-    ////////
-
-    pushCheckboxTasks = (event) => {
-
-        let checkboxElement = event.target.closest('div');
-        let arrayCheckboxElements = this.state.checkboxTask;
-
-        if (arrayCheckboxElements.includes(checkboxElement)) {
-            arrayCheckboxElements.splice(checkboxElement, 0);
+        if (newCheckboxTask.has(taskId)) {
+            newCheckboxTask.delete(taskId)
         }
         else {
-            arrayCheckboxElements.push(checkboxElement);
-        };
-
+            newCheckboxTask.add(taskId)
+        }
 
         this.setState({
-            checkboxTask: arrayCheckboxElements
+            checkboxTask: newCheckboxTask
         });
 
     };
 
-    //////
-
-    newTaskPush = () => {
-
-        if (this.state.newTaskTitle && this.state.newTaskDescription && this.state.newTaskCreated && this.state.newTaskStatus) {
-            let tasks = [...this.state.tasks];
-
-            let newObject = {
-                title: this.state.newTaskTitle,
-                description: this.state.newTaskDescription,
-                date: this.state.newTaskDate,
-                created: this.state.newTaskCreated,
-                status: this.state.newTaskStatus
-            };
-
-            tasks.push(newObject);
-
-            this.setState({
-                tasks,
-                newTaskTitle: '',
-                newTaskDescription: '',
-                newTaskDate: '',
-                newTaskCreated: '',
-                newTaskStatus: ''
-            });
-
-        }
-
-        else{
-            alert("Please fill in all the boxes");
-        }
-
-    };
-
     ////////
 
-    remowTask = (event) => {
-        let element = event.target.closest('div');
+    remowTask = (taskId) => {
+        let filterTask = this.state.tasks.filter((element) => {
+            if (element._id === taskId) {
+                return false
+            }
+            else { return true }
+        })
 
-        element.remove();
+        this.setState({
+            tasks: filterTask
+        });
     }
 
     ////////
 
-    remoweCheckboxTask = (event) => {
-        this.state.checkboxTask.forEach((elem, index) => {
-            elem.remove();
+    closeTask = () => {
+        this.setState({
+            editTaskObject: null
+        });
+    }
+
+
+    ////////
+
+    remoweCheckboxTask = () => {
+
+        let { tasks, checkboxTask } = this.state;
+
+        let newTasks = tasks.filter((elem) => {
+            if (checkboxTask.has(elem._id)) {
+                return false
+            }
+            else { return true }
         });
 
         this.setState({
-            checkboxTask: []
+            tasks: newTasks,
+            checkboxTask: new Set(),
+            showDeleteTasks: false
         });
 
     };
@@ -140,76 +86,196 @@ class ToDoList extends Component {
     //////
 
 
+    editClick = (taskObject) => {
+
+        this.setState({
+            editTaskObject: taskObject
+        });
+
+    }
+
+    //////
+
+    closeConfirm = () => {
+        this.setState({
+            showDeleteTasks: !this.state.showDeleteTasks
+        });
+    }
+
+    //////
+
+    openAddTask = () => {
+        this.setState({
+            showAddNewTask: !this.state.showAddNewTask
+        });
+    }
+
+
+    /////
+
+
+    getNewObject = (obj) => {
+        let tasks = [...this.state.tasks, obj];
+
+        this.setState({
+            tasks,
+            showAddNewTask: false
+        });
+
+    }
+
+
+    ////
+
+    selectAllTasks = () => {
+
+        let newTaskArray = this.state.tasks.map((element) => {
+            return element._id
+        });
+
+        this.setState({
+            checkboxTask: new Set(newTaskArray)
+        });
+
+    }
+
+
+    /////
+
+    deSelectAllTasks = () => {
+        this.setState({
+            checkboxTask: new Set()
+        });
+    }
+
+
+    /////
+
+    editTaskTransfer = (editedTask) => {
+
+        let tasks = [...this.state.tasks];
+        let foundIndex = tasks.findIndex((task) => task._id === editedTask._id);
+        tasks[foundIndex] = editedTask;
+
+        this.setState({
+            tasks,
+            editTaskObject: null
+        });
+
+    }
+
+    /////
+
+
     tasksCycle = () => {
 
-        let dateYear = new Date();
+        let { checkboxTask } = this.state;
 
-        return this.state.tasks.map((el, index) => {
-            return <Card className={stayls.taskCard} style={{ width: '18rem' }} key={index}>
-                <input type='checkbox' onClick={this.pushCheckboxTasks} />
-                <Card.Body>
-                    <Card.Title>{el.title}</Card.Title>
-                    <Card.Text>
-                        {el.description}
-                    </Card.Text>
-                </Card.Body>
-                <ListGroup className="list-group-flush">
-                    <ListGroupItem> {dateYear.getDate()} {dateYear.getMonth() + '1'} {dateYear.getFullYear()} </ListGroupItem>
-                    <ListGroupItem>{el.created}</ListGroupItem>
-                    <ListGroupItem>{el.status}</ListGroupItem>
-                </ListGroup>
-                <Button className={stayls.taskButton} variant="outline-success">FINISH</Button>{' '}
-                <Button className={stayls.taskButton} variant="outline-warning">EDIT</Button>{' '}
-                <Button className={stayls.taskButton} variant="outline-danger" onClick={this.remowTask}>REMOW</Button>{' '}
-            </Card>
+        return this.state.tasks.map((element) => {
+            return <Col className={styles.colCard}
+                key={element._id}
+                xs={12}
+                sm={6}
+                md={5}
+                lg={4}
+                xl={3}
+            >
+
+                <Tasks
+                    onPushCheckboxTasks={this.pushCheckboxTasks}
+                    element={element}
+                    onEditClick={this.editClick}
+                    onCheckboxTask={checkboxTask}
+                    onRemowTask={this.remowTask}
+                    selectedCheckbox={checkboxTask.has(element._id)}
+                />
+
+            </Col>
+
         })
     }
 
     //////////
 
     render() {
-        let { tasks } = this.state;
 
-        return (<div>
-            <h1 className={stayls.toDoListTitle}>TODO LIST</h1>
-            <div className={stayls.tasksInputAndButton}>
+        let { checkboxTask, tasks, editTaskObject } = this.state;
 
-                <input
-                    className={stayls.inputTaskTitle}
-                    type="text"
-                    value={this.state.newTaskTitle}
-                    onChange={this.changeInputValue}
-                />
-                <input
-                    className={stayls.inputTaskDescription}
-                    type="text"
-                    value={this.state.newTaskDescription}
-                    onChange={this.changeInputValue}
-                />
-                <input
-                    className={stayls.inputTaskCreated}
-                    type="text"
-                    value={this.state.newTaskCreated}
-                    onChange={this.changeInputValue}
-                />
-                <input
-                    className={stayls.newTaskStatus}
-                    type="text"
-                    value={this.state.newTaskStatus}
-                    onChange={this.changeInputValue}
-                />
-                <InputGroup.Append className={stayls.addAndRemowButtons}>
-                    <Button className={stayls.addTaskButton} onClick={this.newTaskPush}>ADD TASK</Button>
-                    <Button className={stayls.remoweAllTasks} onClick={this.remoweCheckboxTask}>REMOWE TASKS</Button>
-                </InputGroup.Append>
+        return (
+            <div>
+                <h1 className={styles.toDoListTitle}>TODO LIST</h1>
+                <Container>
 
+                    <Row className={styles.buttonsRow}>
+                        <Col>
+                            <Button
+                                onClick={this.openAddTask}>
+                                ADD TASK
+                            </Button>
+                        </Col>
+
+                        <Col>
+                            <Button
+                                className={styles.remoweTaskButton}
+                                onClick={this.closeConfirm}
+                                disabled={!checkboxTask.size}
+                                variant='danger'
+                            >
+                                REMOWE TASKS
+                        </Button>
+
+                        </Col>
+
+                        <Col>
+                            <Button
+                                onClick={this.selectAllTasks}
+                                disabled={!tasks.length}
+                                variant='warning'>
+                                SELECT ALL
+                            </Button>
+                        </Col>
+
+                        <Col>
+                            <Button
+                                onClick={this.deSelectAllTasks}
+                                disabled={!checkboxTask.size}
+                                variant='warning'>
+                                DESELECT ALL
+                            </Button>
+                        </Col>
+
+
+                    </Row>
+
+                    <Row className={styles.cardsRow}>
+                        {this.tasksCycle()}
+                    </Row>
+
+                </Container>
+
+
+
+                {this.state.showAddNewTask &&
+                    <TaskInput
+                        onClose={this.openAddTask}
+                        onTransfer={this.getNewObject}
+                    />}
+
+                {this.state.showDeleteTasks &&
+                    <Confirm
+                        onCloseConfirm={this.closeConfirm}
+                        onConfirmDelete={this.remoweCheckboxTask}
+                        sizeSet={checkboxTask.size}
+                    />
+                }
+
+                {this.state.editTaskObject &&
+                    <EditTask
+                        onCloseTask={this.closeTask}
+                        onEditTaskTransfer={this.editTaskTransfer}
+                        objectTask={editTaskObject}
+                    />}
             </div >
-            <Container>
-                <Row className={stayls.cardsRow}>
-                    <Col>{this.tasksCycle()} </Col>
-                </Row>
-            </Container>
-        </div >
 
         );
 
@@ -218,9 +284,3 @@ class ToDoList extends Component {
 }
 
 export default ToDoList;
-
-
-
-
-
-

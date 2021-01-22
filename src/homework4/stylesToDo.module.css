@@ -1,0 +1,41 @@
+.toDoListTitle{
+    color: black;
+    text-align: center;
+    margin: 3%;
+}
+
+.buttonsRow{
+    text-align: center;
+}
+
+
+.allTasks{
+    text-align: center;
+    height: auto;
+    width: auto;
+}
+
+
+.inputTaskTitle, .inputTaskDescription, .inputTaskCreated, .newTaskStatus{
+    border-left: solid aqua;
+    border-right: none;
+    border-top: none;
+    border-bottom: solid aqua;
+    width: 70% !important;
+    margin-bottom: 1% !important;
+}
+
+.colCard{
+    margin: 1% !important;
+    padding: 0% !important;
+}
+
+.taskCard{
+    background-color: aqua !important; 
+    text-align: center;
+}
+
+.cardsRow{
+    margin-top: 3% !important;
+}
+
