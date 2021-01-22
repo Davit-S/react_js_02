@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import style from "./style.module.css";
 import { Card, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
 
 
 export default class Tasks extends Component {
@@ -11,8 +13,10 @@ export default class Tasks extends Component {
         let dateYear = new Date();
         let { onPushCheckboxTasks, element, selectedCheckbox, onEditClick, onRemowTask, onCheckboxTask } = this.props;
 
-        return <Card style={{ width: '18rem' }}>
+        return <Card className={` ${selectedCheckbox ? style.selectedCheckbox : style.cardTask} `}
+            style={{ width: '18rem' }}>
             <input
+                className={style.checkboxInput}
                 type='checkbox'
                 checked={selectedCheckbox}
                 onChange={() => onPushCheckboxTasks(element._id)} />
@@ -26,15 +30,16 @@ export default class Tasks extends Component {
                 <Button variant="warning"
                     onClick={() => { onEditClick(element) }}
                     className={style.taskButton}
-                > EDIT </Button>
+                >  <FontAwesomeIcon icon={faEdit} /> </Button>
                 <Button variant="danger"
                     onClick={() => { onRemowTask(element._id) }}
                     disabled={!!onCheckboxTask.size}
                     className={style.taskButton}
-                > REMOW </Button>
+                >   <FontAwesomeIcon icon={faTrash} />
+                </Button>
             </Card.Body>
-        </Card>  
-        
+        </Card>
+
     }
 
 }
@@ -44,8 +49,9 @@ Tasks.propTypes = {
     onEditClick: PropTypes.func.isRequired,
     onCheckboxTask: PropTypes.object.isRequired,
     onRemowTask: PropTypes.func.isRequired,
-    onEditClick: PropTypes.func.isRequired
-}
+    onEditClick: PropTypes.func.isRequired,
+    element: PropTypes.object.isRequired
+};
 
 
 

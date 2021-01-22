@@ -1,6 +1,22 @@
+.cardTask{
+    background-color: rgba(189, 252, 210, 0.3) !important;
+    text-align: center !important;
+}
+
 .taskButton{
-    color: white !important;
     margin-right: 2%;
+}
+
+.checkboxInput{
+    margin-top: 2% !important;
+    margin-left: 2% !important;
+
+}
+
+.selectedCheckbox{
+    border: 1px solid blue !important;
+    background-color: rgba(0, 174, 255, 0.2) !important;
+    text-align: center !important;
 }
 
 
@@ -12,3 +28,4 @@
     border-bottom: solid rgb(238, 255, 0);
     width: 90% !important;
 }
+

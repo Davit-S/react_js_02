@@ -15,13 +15,13 @@ export default class TaskInput extends Component {
 
     changeInputValue = (event) => {
 
-        let {name, value} = event.target;
+        let { name, value } = event.target;
 
         this.setState({
             [name]: value
         })
 
-        
+
     };
 
 
@@ -61,9 +61,11 @@ export default class TaskInput extends Component {
 
     render() {
 
+        let {onClose} = this.props;
+
         return <Modal
             show={true}
-            onHide={this.props.onClose}
+            onHide={onClose}
             size="lg"
             aria-labelledby="contained-modal-title-vcenter"
             centered
@@ -95,13 +97,15 @@ export default class TaskInput extends Component {
 
             <Modal.Footer>
                 <Button
+                    style={{ backgroundColor: "lime" }}
                     onClick={this.newTaskPush}
                     variant='success'
                 >
-                    Add
+                    Add task
             </Button>
-                <Button 
-                onClick={this.props.onClose}>
+                <Button
+                    onClick={onClose}
+                    variant='secondary'>
                     Cancel
                     </Button>
             </Modal.Footer>
@@ -111,5 +115,6 @@ export default class TaskInput extends Component {
 }
 
 TaskInput.propTypes = {
-    onTransfer: PropTypes.func.isRequired
+    onTransfer: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired
 }

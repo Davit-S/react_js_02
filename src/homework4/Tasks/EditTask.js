@@ -1,33 +1,49 @@
 import React, { Component } from 'react';
 import { Button, Modal, FormControl } from 'react-bootstrap';
+import PropTypes from 'prop-types';
+
 
 export default class EditTask extends Component {
-
-    state = {
-        taskEditTitle: this.props.objectTask.title,
-        taskEditDescription: this.props.objectTask.description
+    constructor(props){
+        super(props);
+        this.state = {
+            ...props.objectTask
+        };
     }
 
-
     changeInputValue = (event) => {
-
         let {name, value} = event.target;
 
         this.setState({
             [name]: value
         })
-
-        
     };
+
+    handleSubmit = ()=>{
+        const title = this.state.title.trim();
+        const description = this.state.description.trim();
+
+        if (!title) {
+            return;
+        }
+
+        this.props.onEditTaskTransfer({
+          _id: this.state._id,
+          title,
+          description
+        });
+    };
+
 
 
     render() {
 
-        let { onToggleEditTask, onEditTaskTransfer } = this.props;
+        let { onCloseTask } = this.props;
+        const {title, description} = this.state;
 
         return <Modal
             show={true}
-            onHide={onToggleEditTask}
+            onHide={onCloseTask}
             size="lg"
             aria-labelledby="contained-modal-title-vcenter"
             centered
@@ -42,18 +58,18 @@ export default class EditTask extends Component {
                 <FormControl
                     placeholder="Title"
                     onChange={this.changeInputValue}
-                    name='taskEditTitle'
+                    name='title'
                     onKeyPress={this.handleKeyDown}
                     className='mb-3'
-                    value={this.state.taskEditTitle}
+                    value={title}
                 />
                 <FormControl
                     placeholder="Description"
                     as="textarea"
                     rows={5}
-                    name='taskEditDescription'
+                    name='description'
                     onChange={this.changeInputValue}
-                    value={this.state.taskEditDescription}
+                    value={description}
                 />
 
             </Modal.Body>
@@ -61,13 +77,14 @@ export default class EditTask extends Component {
 
             <Modal.Footer>
                 <Button
-                    onClick={()=>{onEditTaskTransfer(this.props.objectTask._id, this.state.taskEditTitle, this.state.taskEditDescription)}}
+                    onClick={this.handleSubmit}
                     variant='success'
                 >
                     Save
             </Button>
                 <Button 
-                onClick={onToggleEditTask}
+                onClick={onCloseTask}
+                variant='secondary'
                 >
                     Cancel
                     </Button>
@@ -77,4 +94,8 @@ export default class EditTask extends Component {
     }
 }
 
+EditTask.propTypes = {
+    onCloseTask: PropTypes.func.isRequired,
+    onEditTaskTransfer: PropTypes.func.isRequired
+};
 

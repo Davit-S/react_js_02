@@ -1,7 +1,13 @@
 .toDoListTitle{
     color: black;
     text-align: center;
+    margin: 3%;
 }
+
+.buttonsRow{
+    text-align: center;
+}
+
 
 .allTasks{
     text-align: center;
@@ -27,5 +33,9 @@
 .taskCard{
     background-color: aqua !important; 
     text-align: center;
+}
+
+.cardsRow{
+    margin-top: 3% !important;
 }
 
