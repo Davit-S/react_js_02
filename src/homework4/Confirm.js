@@ -1,5 +1,6 @@
 import React from 'react';
 import {Modal, Button} from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 function Confirm(props){
 
@@ -27,6 +28,12 @@ function Confirm(props){
       </Modal.Footer>
     </Modal>
     )
+}
+
+Confirm.propTypes = {
+  onCloseConfirm: PropTypes.func.isRequired,
+  sizeSet: PropTypes.number.isRequired,
+  onConfirmDelete: PropTypes.func.isRequired
 }
 
 

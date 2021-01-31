@@ -1,11 +1,8 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Button, Modal, FormControl } from 'react-bootstrap';
-import idGenerator from "../helpers/idGenerator";
 import PropTypes from 'prop-types';
 
-
-
-export default class TaskInput extends Component {
+export default class TaskInput extends PureComponent {
 
     state = {
         taskTitle: "",
@@ -29,10 +26,9 @@ export default class TaskInput extends Component {
         let newTitle = this.state.taskTitle.trim();
         let newDescription = this.state.taskDescription.trim();
 
-        if (newTitle && newDescription) {
+        if (newTitle) {
 
             let newObject = {
-                _id: idGenerator(),
                 title: newTitle,
                 description: newDescription,
             };
@@ -47,7 +43,7 @@ export default class TaskInput extends Component {
         }
 
         else {
-            alert("Please fill in the box");
+            return
         }
 
     };

@@ -1,13 +1,13 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Button, Modal, FormControl } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 
-export default class EditTask extends Component {
+export default class EditTask extends PureComponent {
     constructor(props){
         super(props);
         this.state = {
-            ...props.objectTask
+            ...props.task
         };
     }
 

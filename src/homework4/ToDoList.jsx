@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import styles from './stylesToDo.module.css';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import Tasks from "./Tasks/Tasks";
@@ -7,7 +7,7 @@ import Confirm from './Confirm';
 import EditTask from './Tasks/EditTask';
 
 
-class ToDoList extends Component {
+class ToDoList extends PureComponent {
 
     state = {
         showDeleteTasks: false,
@@ -41,16 +41,39 @@ class ToDoList extends Component {
     ////////
 
     remowTask = (taskId) => {
-        let filterTask = this.state.tasks.filter((element) => {
-            if (element._id === taskId) {
-                return false
-            }
-            else { return true }
-        })
 
-        this.setState({
-            tasks: filterTask
-        });
+        fetch(`http://localhost:3001/task/${taskId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then( async (resualt) => {
+            const res = await resualt.json();
+
+            if (resualt.status>=400 && resualt.status<=600) {
+                if (res.error) {
+                    throw res.error
+                }
+                else{
+                    throw new Error('Something went wrong!')
+                }                
+            }
+            
+            let filterTask = this.state.tasks.filter((element) => {
+                if (element._id === taskId) {
+                    return false
+                }
+                else { return true }
+            })
+    
+            this.setState({
+                tasks: filterTask
+            });
+                
+        }).catch((error)=>{
+            console.log(error);
+        })    
+
     }
 
     ////////
@@ -61,14 +84,35 @@ class ToDoList extends Component {
         });
     }
 
-
     ////////
 
     remoweCheckboxTask = () => {
 
-        let { tasks, checkboxTask } = this.state;
+        let taskArray = this.state.tasks;
+        let { checkboxTask } = this.state;
 
-        let newTasks = tasks.filter((elem) => {
+        let newArray = Array.from(checkboxTask)
+        
+        fetch('http://localhost:3001/task', {
+            method: 'PATCH',
+            body: JSON.stringify({tasks: newArray}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then( async (resualt) => {
+
+            const res = await resualt.json();
+
+            if (resualt.status>=400 && resualt.status<=600) {
+                if (res.error) {
+                    throw res.error
+                }
+                else{
+                    throw new Error('Something went wrong!')
+                }                
+            }
+            
+        let newTasks = taskArray.filter((elem) => {
             if (checkboxTask.has(elem._id)) {
                 return false
             }
@@ -80,6 +124,11 @@ class ToDoList extends Component {
             checkboxTask: new Set(),
             showDeleteTasks: false
         });
+
+        }).catch((error)=>{
+            console.log(error);
+        })
+
 
     };
 
@@ -114,14 +163,71 @@ class ToDoList extends Component {
     /////
 
 
+    componentDidMount(){
+
+        fetch('http://localhost:3001/task', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then( async (resualt) => {
+
+            const res = await resualt.json();
+
+            if (resualt.status>=400 && resualt.status<=600) {
+                if (res.error) {
+                    throw res.error
+                }
+                else{
+                    throw new Error('Something went wrong!')
+                }                
+            }
+            
+            this.setState({
+                tasks: res,
+            });
+            
+        }).catch((error)=>{
+            console.log(error);
+        })
+
+    }
+
+
+    /////
+
+
     getNewObject = (obj) => {
-        let tasks = [...this.state.tasks, obj];
 
-        this.setState({
-            tasks,
-            showAddNewTask: false
-        });
+        fetch('http://localhost:3001/task', {
+            method: 'POST',
+            body: JSON.stringify(obj),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then( async (resualt) => {
 
+            const task = await resualt.json()
+
+            if (resualt.status>=400 && resualt.status<=600) {
+                if (task.error) {
+                    throw task.error
+                }
+                else{
+                    throw new Error('Something went wrong!')
+                }                
+            }
+            
+            let tasks = [...this.state.tasks, task];
+
+            this.setState({
+                tasks,
+                showAddNewTask: false
+            });
+            
+        }).catch((error)=>{
+            console.log(error);
+        })
     }
 
 
@@ -153,14 +259,38 @@ class ToDoList extends Component {
 
     editTaskTransfer = (editedTask) => {
 
-        let tasks = [...this.state.tasks];
-        let foundIndex = tasks.findIndex((task) => task._id === editedTask._id);
-        tasks[foundIndex] = editedTask;
+        fetch(`http://localhost:3001/task/${editedTask._id}`, {
+            method: 'PUT',
+            body: JSON.stringify(editedTask),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then( async (resualt) => {
 
-        this.setState({
-            tasks,
-            editTaskObject: null
-        });
+            const task = await resualt.json()
+
+            if (resualt.status>=400 && resualt.status<=600) {
+                if (task.error) {
+                    throw task.error
+                }
+                else{
+                    throw new Error('Something went wrong!')
+                }                
+            }
+            
+            let tasks = [...this.state.tasks];
+            let foundIndex = tasks.findIndex((task) => task._id === editedTask._id);
+            tasks[foundIndex] = editedTask;
+    
+            this.setState({
+                tasks,
+                editTaskObject: null
+            });
+    
+            
+        }).catch((error)=>{
+            console.log(error);
+        })
 
     }
 
@@ -216,18 +346,6 @@ class ToDoList extends Component {
 
                         <Col>
                             <Button
-                                className={styles.remoweTaskButton}
-                                onClick={this.closeConfirm}
-                                disabled={!checkboxTask.size}
-                                variant='danger'
-                            >
-                                REMOWE TASKS
-                        </Button>
-
-                        </Col>
-
-                        <Col>
-                            <Button
                                 onClick={this.selectAllTasks}
                                 disabled={!tasks.length}
                                 variant='warning'>
@@ -244,6 +362,17 @@ class ToDoList extends Component {
                             </Button>
                         </Col>
 
+                        <Col>
+                            <Button
+                                className={styles.remoweTaskButton}
+                                onClick={this.closeConfirm}
+                                disabled={!checkboxTask.size}
+                                variant='danger'
+                            >
+                                REMOWE TASKS
+                        </Button>
+
+                        </Col>
 
                     </Row>
 
@@ -273,7 +402,7 @@ class ToDoList extends Component {
                     <EditTask
                         onCloseTask={this.closeTask}
                         onEditTaskTransfer={this.editTaskTransfer}
-                        objectTask={editTaskObject}
+                        task={editTaskObject}
                     />}
             </div >
 

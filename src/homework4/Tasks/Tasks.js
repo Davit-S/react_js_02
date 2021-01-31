@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import style from "./style.module.css";
 import { Card, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
@@ -6,12 +6,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
 
 
-export default class Tasks extends Component {
+export default class Tasks extends PureComponent {
 
     render() {
 
-        let dateYear = new Date();
-        let { onPushCheckboxTasks, element, selectedCheckbox, onEditClick, onRemowTask, onCheckboxTask } = this.props;
+        const dateYear = new Date();
+        const { onPushCheckboxTasks, element, selectedCheckbox, onEditClick, onRemowTask, onCheckboxTask } = this.props;
 
         return <Card className={` ${selectedCheckbox ? style.selectedCheckbox : style.cardTask} `}
             style={{ width: '18rem' }}>
@@ -46,7 +46,6 @@ export default class Tasks extends Component {
 
 Tasks.propTypes = {
     onPushCheckboxTasks: PropTypes.func.isRequired,
-    onEditClick: PropTypes.func.isRequired,
     onCheckboxTask: PropTypes.object.isRequired,
     onRemowTask: PropTypes.func.isRequired,
     onEditClick: PropTypes.func.isRequired,
