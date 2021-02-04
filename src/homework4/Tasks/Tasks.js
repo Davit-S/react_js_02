@@ -4,14 +4,18 @@ import { Card, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
+import {formatDate} from '../helpers/formatDate'
+import {NavLink} from 'react-router-dom';
+import {singleTask} from '../Pages/SingleTask';
+
 
 
 export default class Tasks extends PureComponent {
 
     render() {
 
-        const dateYear = new Date();
         const { onPushCheckboxTasks, element, selectedCheckbox, onEditClick, onRemowTask, onCheckboxTask } = this.props;
+
 
         return <Card className={` ${selectedCheckbox ? style.selectedCheckbox : style.cardTask} `}
             style={{ width: '18rem' }}>
@@ -22,10 +26,17 @@ export default class Tasks extends PureComponent {
                 onChange={() => onPushCheckboxTasks(element._id)} />
 
             <Card.Body>
+                <NavLink
+                to='/singletask'
+                exact
+                >
                 <Card.Title>{element.title}</Card.Title>
-                <Card.Title>{element.description}</Card.Title>
+                </NavLink>
                 <Card.Text>
-                    {dateYear.getDate()} {dateYear.getMonth() + '1'} {dateYear.getFullYear()}
+                    Description: {element.description}</Card.Text>
+                <Card.Text>
+                    Date: {formatDate(element.date)}
+
                 </Card.Text>
                 <Button variant="warning"
                     onClick={() => { onEditClick(element) }}

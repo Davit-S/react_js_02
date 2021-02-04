@@ -1,12 +1,16 @@
 import React, { PureComponent } from 'react';
 import { Button, Modal, FormControl } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import DatePicker from "react-datepicker";
+import {formatDate} from '../helpers/formatDate'
+
 
 export default class TaskInput extends PureComponent {
 
     state = {
         taskTitle: "",
         taskDescription: "",
+        date: new Date()
     }
 
 
@@ -21,24 +25,27 @@ export default class TaskInput extends PureComponent {
 
     };
 
+    handleChangeDate = (value) => {
+        this.setState({
+            date: value || new Date()
+        });
+    };
+
 
     newTaskPush = () => {
-        let newTitle = this.state.taskTitle.trim();
-        let newDescription = this.state.taskDescription.trim();
 
-        if (newTitle) {
+        let { taskTitle, taskDescription, date } = this.state
+
+        if (taskTitle) {
 
             let newObject = {
-                title: newTitle,
-                description: newDescription,
+                title: taskTitle,
+                description: taskDescription,
+                date: formatDate(date.toISOString())
             };
 
             this.props.onTransfer(newObject);
 
-            this.setState({
-                taskTitle: "",
-                taskDescription: ""
-            });
 
         }
 
@@ -57,7 +64,7 @@ export default class TaskInput extends PureComponent {
 
     render() {
 
-        let {onClose} = this.props;
+        let { onClose } = this.props;
 
         return <Modal
             show={true}
@@ -86,6 +93,12 @@ export default class TaskInput extends PureComponent {
                     rows={5}
                     name='taskDescription'
                     onChange={this.changeInputValue}
+                />
+
+                <DatePicker
+                    minDate={new Date()}
+                    selected={this.state.date}
+                    onChange={this.handleChangeDate}
                 />
 
             </Modal.Body>
