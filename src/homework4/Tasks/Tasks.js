@@ -6,9 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
 import {formatDate} from '../helpers/formatDate'
 import {NavLink} from 'react-router-dom';
-import {singleTask} from '../Pages/SingleTask';
-
-
+import {formatDescription} from '../helpers/formatDate';
 
 export default class Tasks extends PureComponent {
 
@@ -27,13 +25,13 @@ export default class Tasks extends PureComponent {
 
             <Card.Body>
                 <NavLink
-                to='/singletask'
+                to={`/singletask/${element._id}`} 
                 exact
                 >
                 <Card.Title>{element.title}</Card.Title>
                 </NavLink>
                 <Card.Text>
-                    Description: {element.description}</Card.Text>
+                    Description: {formatDescription(element.description)}</Card.Text>
                 <Card.Text>
                     Date: {formatDate(element.date)}
 
