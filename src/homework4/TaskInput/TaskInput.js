@@ -1,15 +1,16 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Button, Modal, FormControl } from 'react-bootstrap';
-import idGenerator from "../helpers/idGenerator";
 import PropTypes from 'prop-types';
+import DatePicker from "react-datepicker";
+import {formatDate} from '../helpers/formatDate'
 
 
-
-export default class TaskInput extends Component {
+export default class TaskInput extends PureComponent {
 
     state = {
         taskTitle: "",
         taskDescription: "",
+        date: new Date()
     }
 
 
@@ -24,30 +25,32 @@ export default class TaskInput extends Component {
 
     };
 
+    handleChangeDate = (value) => {
+        this.setState({
+            date: value || new Date()
+        });
+    };
+
 
     newTaskPush = () => {
-        let newTitle = this.state.taskTitle.trim();
-        let newDescription = this.state.taskDescription.trim();
 
-        if (newTitle && newDescription) {
+        let { taskTitle, taskDescription, date } = this.state
+
+        if (taskTitle) {
 
             let newObject = {
-                _id: idGenerator(),
-                title: newTitle,
-                description: newDescription,
+                title: taskTitle,
+                description: taskDescription,
+                date: formatDate(date.toISOString())
             };
 
             this.props.onTransfer(newObject);
 
-            this.setState({
-                taskTitle: "",
-                taskDescription: ""
-            });
 
         }
 
         else {
-            alert("Please fill in the box");
+            return
         }
 
     };
@@ -61,7 +64,7 @@ export default class TaskInput extends Component {
 
     render() {
 
-        let {onClose} = this.props;
+        let { onClose } = this.props;
 
         return <Modal
             show={true}
@@ -90,6 +93,12 @@ export default class TaskInput extends Component {
                     rows={5}
                     name='taskDescription'
                     onChange={this.changeInputValue}
+                />
+
+                <DatePicker
+                    minDate={new Date()}
+                    selected={this.state.date}
+                    onChange={this.handleChangeDate}
                 />
 
             </Modal.Body>

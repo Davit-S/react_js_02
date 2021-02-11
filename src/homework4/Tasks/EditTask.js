@@ -1,25 +1,36 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Button, Modal, FormControl } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import DatePicker from "react-datepicker";
+import { formatDate } from '../helpers/formatDate'
 
 
-export default class EditTask extends Component {
-    constructor(props){
+export default class EditTask extends PureComponent {
+    constructor(props) {
         super(props);
+        const {date} = props.task;
+
         this.state = {
-            ...props.objectTask
+            ...props.task,
+            date: date ? new Date(date) : new Date()
         };
     }
 
     changeInputValue = (event) => {
-        let {name, value} = event.target;
+        let { name, value } = event.target;
 
         this.setState({
             [name]: value
         })
     };
 
-    handleSubmit = ()=>{
+    handleChangeDate=(value)=>{
+        this.setState({
+          date: value || new Date()
+        });
+      };
+
+    handleSubmit = () => {
         const title = this.state.title.trim();
         const description = this.state.description.trim();
 
@@ -28,9 +39,10 @@ export default class EditTask extends Component {
         }
 
         this.props.onEditTaskTransfer({
-          _id: this.state._id,
-          title,
-          description
+            _id: this.state._id,
+            title,
+            description,
+            date: formatDate(this.state.date.toISOString())
         });
     };
 
@@ -39,7 +51,7 @@ export default class EditTask extends Component {
     render() {
 
         let { onCloseTask } = this.props;
-        const {title, description} = this.state;
+        const { title, description } = this.state;
 
         return <Modal
             show={true}
@@ -71,6 +83,11 @@ export default class EditTask extends Component {
                     onChange={this.changeInputValue}
                     value={description}
                 />
+                <DatePicker
+                    minDate={new Date()}
+                    selected={this.state.date}
+                    onChange={this.handleChangeDate}
+                />
 
             </Modal.Body>
 
@@ -82,9 +99,9 @@ export default class EditTask extends Component {
                 >
                     Save
             </Button>
-                <Button 
-                onClick={onCloseTask}
-                variant='secondary'
+                <Button
+                    onClick={onCloseTask}
+                    variant='secondary'
                 >
                     Cancel
                     </Button>
