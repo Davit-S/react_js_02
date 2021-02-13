@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Button, FormControl, InputGroup } from 'react-bootstrap';
+import { Container, Row, Col, Button, Form } from 'react-bootstrap';
+import styles from './styleContact.module.css'
 
+const requiredErrorMessage = 'Field is required';
 
 export default function Contact() {
 
@@ -11,8 +13,14 @@ export default function Contact() {
         "email": "",
         "message": ""
     }
-    let state = useState(textObject);
 
+
+    let [stateObj, setValue] = useState(textObject);
+    let [errors, setErrors] = useState({
+        name: null,
+        email: null,
+        message: null
+    })
 
     useEffect(() => {
         inputName.current.focus();
@@ -21,11 +29,12 @@ export default function Contact() {
 
     let formMassage = () => {
 
-        let [stateObj, setValue] = state;
+        const arrayValues = Object.values(stateObj);
+        const arrayExist = Object.values(errors);
+        const errorsExist = !arrayExist.every(el => el === null);
+        const valuesExist = !arrayValues.some(el => el === "");
 
-        console.log(stateObj);
-
-        if (stateObj.name && stateObj.email) {
+        if (valuesExist && !errorsExist) {
 
             fetch('http://localhost:3001/form', {
                 method: 'POST',
@@ -47,70 +56,151 @@ export default function Contact() {
                 }
 
                 setValue(textObject);
-                
+
             }).catch((error) => {
                 console.log(error);
             })
 
 
         }
+        if (!valuesExist && !errorsExist) {
+            setErrors({
+                name: requiredErrorMessage,
+                email: requiredErrorMessage,
+                message: requiredErrorMessage
+            });
+
+        }
 
 
     }
 
-    let changeInputValu = (event) => {
-        let [obj, setValue] = state;
+
+
+
+
+
+
+
+
+
+
+    let changeInputValue = (event) => {
         let { name, value } = event.target;
-        obj[name] = value
+        stateObj[name] = value;
 
-        setValue({
-            ...obj
-        })
+        if (!value.trim()) {
+            setErrors({
+                ...errors,
+                [name]: requiredErrorMessage
+            });
+        }
+        else {
+            setErrors({
+                ...errors,
+                [name]: null
+            });
+        }
+
+
+        const emailReg = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+        if (name === "email") {
+            if (!emailReg.test(value)) {
+                setErrors({
+                    ...errors,
+                    email: 'Invalid email'
+                })
+            }
+            else {
+                setErrors({
+                    ...errors,
+                    email: null
+                })
+
+                setValue({
+                    ...stateObj,
+                    [name]: value
+                });
+
+
+            }
+
+        }
 
     }
 
 
-    return (<div style={{ padding: "2%" }}>
 
-        <InputGroup className="mb-3">
-            <FormControl
-                placeholder="Name"
-                ref={inputName}
-                onChange={changeInputValu}
-                name="name"
-                value={state[0].name}
-            />
-        </InputGroup>
+    return (
+        <Container>
+            <Row className='justify-content-center'>
+                <Col xs={7}>
+                    <Form className='mt-5'>
+                        <h2 className='text-center'>Contact us</h2>
+                        <Form.Group>
+                            <Form.Control
+                                className={errors.name ? styles.invalid : ''}
+                                type="text"
+                                placeholder="Enter your name"
+                                name="name"
+                                ref={inputName}
+                                onChange={changeInputValue}
 
-        <InputGroup className="mb-3">
-            <FormControl
-                placeholder="Email"
-                onChange={changeInputValu}
-                name="email"
-                value={state[0].email}
-            />
-        </InputGroup>
+                                value={stateObj.name}
+                            />
+                            <Form.Text className="text-danger">
+                                {errors.name}
+                            </Form.Text>
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Control
+                                className={errors.email ? styles.invalid : ''}
+                                type="email"
+                                name="email"
+                                value={stateObj.email}
+                                onChange={changeInputValue}
+                                placeholder="Enter email"
+                            />
+                            <Form.Text className="text-danger">
+                                {errors.email}
+                            </Form.Text>
+                        </Form.Group>
 
-        <InputGroup className="mb-3">
-            <FormControl
-                placeholder="Massage"
-                as="textarea"
-                rows={4}
-                onChange={changeInputValu}
-                name="message"
-                value={state[0].message}
-            />
-        </InputGroup>
+                        <Form.Group>
+                            <Form.Control
+                                as="textarea"
+                                className={errors.message ? styles.invalid : ''}
+                                placeholder="Enter your message"
+                                rows={5}
+                                name="message"
+                                value={stateObj.message}
+                                onChange={changeInputValue}
+                            />
+                            <Form.Text className="text-danger">
+                                {errors.message}
+                            </Form.Text>
+                        </Form.Group>
+                        <div className="text-center">
+                            <Button
+                                variant="primary"
+                                onClick={formMassage}
+                                className={styles.submitButton}
+                            >
+                                Send
+                </Button>
+                        </div>
 
-        <Button
-            variant="primary"
-            size="lg"
-            onClick={formMassage}>
-            Large button
-    </Button>
+                    </Form>
+
+                </Col>
+            </Row>
+        </Container>
+    );
 
 
 
-    </div>
-    )
+
+
+
 }
