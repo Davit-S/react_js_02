@@ -1,16 +1,25 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, createRef } from 'react';
 import { Button, Modal, FormControl } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import DatePicker from "react-datepicker";
-import {formatDate} from '../helpers/formatDate'
+import {formatDate} from '../helpers/formatDate';
 
 
 export default class TaskInput extends PureComponent {
+
+    constructor(props){
+        super(props);
+        this.inputTitle = createRef();
+    }
 
     state = {
         taskTitle: "",
         taskDescription: "",
         date: new Date()
+    }
+
+    componentDidMount(){
+        this.inputTitle.current.focus();
     }
 
 
@@ -86,6 +95,7 @@ export default class TaskInput extends PureComponent {
                     name='taskTitle'
                     onKeyPress={this.handleKeyDown}
                     className='mb-3'
+                    ref={this.inputTitle}
                 />
                 <FormControl
                     placeholder="Description"
