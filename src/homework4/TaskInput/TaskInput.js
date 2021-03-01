@@ -2,12 +2,16 @@ import React, { PureComponent, createRef } from 'react';
 import { Button, Modal, FormControl } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import DatePicker from "react-datepicker";
-import {formatDate} from '../helpers/formatDate';
+import "react-datepicker/dist/react-datepicker.css";
+import { formatDate } from '../helpers/formatTexts';
+import { connect } from 'react-redux';
+import { addTask } from '../store/actions'
 
 
-export default class TaskInput extends PureComponent {
 
-    constructor(props){
+class TaskInput extends PureComponent {
+
+    constructor(props) {
         super(props);
         this.inputTitle = createRef();
     }
@@ -18,7 +22,7 @@ export default class TaskInput extends PureComponent {
         date: new Date()
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this.inputTitle.current.focus();
     }
 
@@ -53,9 +57,7 @@ export default class TaskInput extends PureComponent {
                 date: formatDate(date.toISOString())
             };
 
-            this.props.onTransfer(newObject);
-
-
+            this.props.addTask(newObject);
         }
 
         else {
@@ -134,6 +136,12 @@ export default class TaskInput extends PureComponent {
 }
 
 TaskInput.propTypes = {
-    onTransfer: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired
-}
+};
+
+const mapDispatchToProps = {
+    addTask
+};
+
+export default connect(null, mapDispatchToProps)(TaskInput);
+

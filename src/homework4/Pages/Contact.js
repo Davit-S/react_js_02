@@ -1,12 +1,13 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 import styles from './styleContact.module.css'
+import { connect } from 'react-redux';
+import { contactUse } from '../store/actions';
 
 const requiredErrorMessage = 'Field is required';
 
-export default function Contact() {
+function Contact(props) {
 
-    let stateFocus = false;
     const inputName = useRef();
     const textObject = {
         "name": "",
@@ -14,9 +15,8 @@ export default function Contact() {
         "message": ""
     }
 
-
-    let [stateObj, setValue] = useState(textObject);
-    let [errors, setErrors] = useState({
+    const [stateObj, setValue] = useState(textObject);
+    const [errors, setErrors] = useState({
         name: null,
         email: null,
         message: null
@@ -24,10 +24,10 @@ export default function Contact() {
 
     useEffect(() => {
         inputName.current.focus();
-    }, [stateFocus])
+    }, [])
 
 
-    let formMassage = () => {
+    const formMassage = () => {
 
         const arrayValues = Object.values(stateObj);
         const arrayExist = Object.values(errors);
@@ -35,31 +35,32 @@ export default function Contact() {
         const valuesExist = !arrayValues.some(el => el === "");
 
         if (valuesExist && !errorsExist) {
+            props.contactUse(JSON.stringify(stateObj))
 
-            fetch('http://localhost:3001/form', {
-                method: 'POST',
-                body: JSON.stringify(stateObj),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }).then(async (resualt) => {
+            // fetch('http://localhost:3001/form', {
+            //     method: 'POST',
+            //     body: JSON.stringify(stateObj),
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     }
+            // }).then(async (resualt) => {
 
-                const task = await resualt.json()
+            //     const task = await resualt.json()
 
-                if (resualt.status >= 400 && resualt.status <= 600) {
-                    if (task.error) {
-                        throw task.error
-                    }
-                    else {
-                        throw new Error('Something went wrong!')
-                    }
-                }
+            //     if (resualt.status >= 400 && resualt.status <= 600) {
+            //         if (task.error) {
+            //             throw task.error
+            //         }
+            //         else {
+            //             throw new Error('Something went wrong!')
+            //         }
+            //     }
 
-                setValue(textObject);
+            //     setValue(textObject);
 
-            }).catch((error) => {
-                console.log(error);
-            })
+            // }).catch((error) => {
+            //     console.log(error);
+            // })
 
 
         }
@@ -76,18 +77,13 @@ export default function Contact() {
     }
 
 
-
-
-
-
-
-
-
-
-
     let changeInputValue = (event) => {
         let { name, value } = event.target;
-        stateObj[name] = value;
+        setValue({
+            ...stateObj,
+            [name]: value
+        });
+
 
         if (!value.trim()) {
             setErrors({
@@ -198,9 +194,10 @@ export default function Contact() {
         </Container>
     );
 
-
-
-
-
-
 }
+
+const mapDispatchToProps = {
+    contactUse
+};
+
+export default connect(null, mapDispatchToProps)(Contact);

@@ -4,9 +4,9 @@ import { Card, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
-import {formatDate} from '../helpers/formatDate'
+import {formatDate} from '../helpers/formatTexts'
 import {NavLink} from 'react-router-dom';
-import {formatDescription} from '../helpers/formatDate';
+import {formatText} from '../helpers/formatTexts';
 
 export default class Tasks extends PureComponent {
 
@@ -31,7 +31,7 @@ export default class Tasks extends PureComponent {
                 <Card.Title>{element.title}</Card.Title>
                 </NavLink>
                 <Card.Text>
-                    Description: {formatDescription(element.description)}</Card.Text>
+                    Description: {formatText(element.description, 60)}</Card.Text>
                 <Card.Text>
                     Date: {formatDate(element.date)}
 
@@ -41,6 +41,7 @@ export default class Tasks extends PureComponent {
                     className={style.taskButton}
                 >  <FontAwesomeIcon icon={faEdit} /> </Button>
                 <Button variant="danger"
+
                     onClick={() => { onRemowTask(element._id) }}
                     disabled={!!onCheckboxTask.size}
                     className={style.taskButton}
