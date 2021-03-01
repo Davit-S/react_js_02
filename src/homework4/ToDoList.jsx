@@ -5,6 +5,9 @@ import Tasks from "./Tasks/Tasks";
 import TaskInput from "../homework4/TaskInput/TaskInput";
 import Confirm from './Confirm';
 import EditTask from './Tasks/EditTask';
+import { connect } from 'react-redux';
+import { getTasks, deleteTask, deleteTasks } from './store/actions';
+import SearchTask from './Search Task/SearchTask';
 
 
 class ToDoList extends PureComponent {
@@ -12,14 +15,48 @@ class ToDoList extends PureComponent {
     state = {
         showDeleteTasks: false,
         showAddNewTask: false,
-        tasks: [],
         checkboxTask: new Set(),
-        showEditTask: false,
-        editTaskObject: null
+        showConfirm: false,
+        editTask: null
     };
 
 
     ////////
+
+    componentDidMount() {
+        this.props.getTasks();
+    }
+
+
+    componentDidUpdate(prevProps) {
+        if (!prevProps.addTaskSuccess && this.props.addTaskSuccess) {
+            this.setState({
+                showAddNewTask: false
+            });
+            return;
+        }
+
+        if (!prevProps.deleteTasksSuccess && this.props.deleteTasksSuccess) {
+            this.setState({
+                selectedTasks: new Set(),
+                showConfirm: false
+            });
+            return;
+        }
+
+        if (!prevProps.editTasksSuccess && this.props.editTasksSuccess) {
+            this.setState({
+                editTask: null
+            });
+            return;
+        }
+
+
+
+    }
+
+
+    ///////////
 
     pushCheckboxTasks = (taskId) => {
 
@@ -38,98 +75,26 @@ class ToDoList extends PureComponent {
 
     };
 
-    ////////
-
-    remowTask = (taskId) => {
-
-        fetch(`http://localhost:3001/task/${taskId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then( async (resualt) => {
-            const res = await resualt.json();
-
-            if (resualt.status>=400 && resualt.status<=600) {
-                if (res.error) {
-                    throw res.error
-                }
-                else{
-                    throw new Error('Something went wrong!')
-                }                
-            }
-            
-            let filterTask = this.state.tasks.filter((element) => {
-                if (element._id === taskId) {
-                    return false
-                }
-                else { return true }
-            })
-    
-            this.setState({
-                tasks: filterTask
-            });
-                
-        }).catch((error)=>{
-            console.log(error);
-        })    
-
-    }
 
     ////////
+
+    toggleConfirm = () => {
+        this.setState({
+            showConfirm: !this.state.showConfirm
+        });
+    };
 
     closeTask = () => {
         this.setState({
-            editTaskObject: null
+            editTask: null
         });
     }
 
     ////////
 
     remoweCheckboxTask = () => {
-
-        let taskArray = this.state.tasks;
-        let { checkboxTask } = this.state;
-
-        let newArray = Array.from(checkboxTask)
-        
-        fetch('http://localhost:3001/task', {
-            method: 'PATCH',
-            body: JSON.stringify({tasks: newArray}),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then( async (resualt) => {
-
-            const res = await resualt.json();
-
-            if (resualt.status>=400 && resualt.status<=600) {
-                if (res.error) {
-                    throw res.error
-                }
-                else{
-                    throw new Error('Something went wrong!')
-                }                
-            }
-            
-        let newTasks = taskArray.filter((elem) => {
-            if (checkboxTask.has(elem._id)) {
-                return false
-            }
-            else { return true }
-        });
-
-        this.setState({
-            tasks: newTasks,
-            checkboxTask: new Set(),
-            showDeleteTasks: false
-        });
-
-        }).catch((error)=>{
-            console.log(error);
-        })
-
-
+        const { checkboxTask } = this.state;
+        this.props.deleteTasks(checkboxTask);
     };
 
     //////
@@ -138,7 +103,7 @@ class ToDoList extends PureComponent {
     editClick = (taskObject) => {
 
         this.setState({
-            editTaskObject: taskObject
+            editTask: taskObject
         });
 
     }
@@ -147,7 +112,7 @@ class ToDoList extends PureComponent {
 
     closeConfirm = () => {
         this.setState({
-            showDeleteTasks: !this.state.showDeleteTasks
+            showConfirm: !this.state.showConfirm
         });
     }
 
@@ -162,80 +127,9 @@ class ToDoList extends PureComponent {
 
     /////
 
-
-    componentDidMount(){
-
-        fetch('http://localhost:3001/task', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then( async (resualt) => {
-
-            const res = await resualt.json();
-
-            if (resualt.status>=400 && resualt.status<=600) {
-                if (res.error) {
-                    throw res.error
-                }
-                else{
-                    throw new Error('Something went wrong!')
-                }                
-            }
-            
-            this.setState({
-                tasks: res,
-            });
-            
-        }).catch((error)=>{
-            console.log(error);
-        })
-
-    }
-
-
-    /////
-
-
-    getNewObject = (obj) => {
-
-        fetch('http://localhost:3001/task', {
-            method: 'POST',
-            body: JSON.stringify(obj),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then( async (resualt) => {
-
-            const task = await resualt.json()
-
-            if (resualt.status>=400 && resualt.status<=600) {
-                if (task.error) {
-                    throw task.error
-                }
-                else{
-                    throw new Error('Something went wrong!')
-                }                
-            }
-            
-            let tasks = [...this.state.tasks, task];
-
-            this.setState({
-                tasks,
-                showAddNewTask: false
-            });
-            
-        }).catch((error)=>{
-            console.log(error);
-        })
-    }
-
-
-    ////
-
     selectAllTasks = () => {
 
-        let newTaskArray = this.state.tasks.map((element) => {
+        let newTaskArray = this.props.tasks.map((element) => {
             return element._id
         });
 
@@ -254,46 +148,6 @@ class ToDoList extends PureComponent {
         });
     }
 
-
-    /////
-
-    editTaskTransfer = (editedTask) => {
-
-        fetch(`http://localhost:3001/task/${editedTask._id}`, {
-            method: 'PUT',
-            body: JSON.stringify(editedTask),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then( async (resualt) => {
-
-            const task = await resualt.json()
-
-            if (resualt.status>=400 && resualt.status<=600) {
-                if (task.error) {
-                    throw task.error
-                }
-                else{
-                    throw new Error('Something went wrong!')
-                }                
-            }
-            
-            let tasks = [...this.state.tasks];
-            let foundIndex = tasks.findIndex((task) => task._id === editedTask._id);
-            tasks[foundIndex] = editedTask;
-    
-            this.setState({
-                tasks,
-                editTaskObject: null
-            });
-    
-            
-        }).catch((error)=>{
-            console.log(error);
-        })
-
-    }
-
     /////
 
 
@@ -301,7 +155,7 @@ class ToDoList extends PureComponent {
 
         let { checkboxTask } = this.state;
 
-        return this.state.tasks.map((element) => {
+        return this.props.tasks.map((element) => {
             return <Col className={styles.colCard}
                 key={element._id}
                 xs={12}
@@ -316,7 +170,7 @@ class ToDoList extends PureComponent {
                     element={element}
                     onEditClick={this.editClick}
                     onCheckboxTask={checkboxTask}
-                    onRemowTask={this.remowTask}
+                    onRemowTask={this.props.deleteTask}
                     selectedCheckbox={checkboxTask.has(element._id)}
                 />
 
@@ -329,12 +183,18 @@ class ToDoList extends PureComponent {
 
     render() {
 
-        let { checkboxTask, tasks, editTaskObject } = this.state;
+        let { checkboxTask, tasks, editTask } = this.state;
 
         return (
             <div>
                 <h1 className={styles.toDoListTitle}>TODO LIST</h1>
-                <Container>
+                <Container className={styles.ToDoContainer}>
+
+                    <Row>
+                        <Col>
+                            <SearchTask />
+                        </Col>
+                    </Row>
 
                     <Row className={styles.buttonsRow}>
                         <Col>
@@ -347,7 +207,6 @@ class ToDoList extends PureComponent {
                         <Col>
                             <Button
                                 onClick={this.selectAllTasks}
-                                disabled={!tasks.length}
                                 variant='warning'>
                                 SELECT ALL
                             </Button>
@@ -390,7 +249,7 @@ class ToDoList extends PureComponent {
                         onTransfer={this.getNewObject}
                     />}
 
-                {this.state.showDeleteTasks &&
+                {this.state.showConfirm &&
                     <Confirm
                         onCloseConfirm={this.closeConfirm}
                         onConfirmDelete={this.remoweCheckboxTask}
@@ -398,11 +257,10 @@ class ToDoList extends PureComponent {
                     />
                 }
 
-                {this.state.editTaskObject &&
+                {this.state.editTask &&
                     <EditTask
                         onCloseTask={this.closeTask}
-                        onEditTaskTransfer={this.editTaskTransfer}
-                        task={editTaskObject}
+                        task={editTask}
                     />}
             </div >
 
@@ -412,4 +270,22 @@ class ToDoList extends PureComponent {
 
 }
 
-export default ToDoList;
+
+const mapStateToProps = (state) => {
+    return {
+        tasks: state.tasks,
+        addTaskSuccess: state.addTaskSuccess,
+        deleteTasksSuccess: state.deleteTasksSuccess,
+        editTasksSuccess: state.editTasksSuccess
+
+    };
+};
+
+
+const mapDispatchToProps = {
+    getTasks,
+    deleteTask,
+    deleteTasks
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ToDoList);

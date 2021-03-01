@@ -1,3 +1,7 @@
+.ToDoContainer{
+    text-align: -webkit-center;
+}
+
 .toDoListTitle{
     color: black;
     text-align: center;
