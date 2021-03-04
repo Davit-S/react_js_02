@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import DatePicker from "react-datepicker";
 import { formatDate } from '../helpers/formatTexts';
 import { editTask } from '../store/actions';
-import {connect} from 'react-redux'
+import {connect} from 'react-redux';
+import handleKeyDown from '../helpers/handleKeyDown';
 
 
 class EditTask extends PureComponent {
@@ -79,8 +80,8 @@ class EditTask extends PureComponent {
                 <FormControl
                     placeholder="Title"
                     onChange={this.changeInputValue}
+                    onKeyPress={(event) => {handleKeyDown(event.key, this.handleSubmit)}}
                     name='title'
-                    onKeyPress={this.handleKeyDown}
                     className='mb-3'
                     value={title}
                     ref={this.inputEditTitle}

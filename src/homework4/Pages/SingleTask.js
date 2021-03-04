@@ -55,7 +55,6 @@ class SingleTask extends Component {
                                     >  <FontAwesomeIcon icon={faEdit} /> </Button>
                                     <Button variant="danger"
                                         onClick={this.remowTask}
-                                    // className={style.taskButton}
                                     >   <FontAwesomeIcon icon={faTrash} />
                                     </Button>
                                 </Card.Body>
@@ -75,12 +74,12 @@ class SingleTask extends Component {
         </div>
     }
 
-
 }
 
 const mapStateToProps = (state) => {
     return {
-        task: state.task
+        task: state.task,
+        editTasksSuccess: state.editTasksSuccess
     }
 }
 

@@ -8,7 +8,6 @@ const defaultState = {
     editTasksSuccess: false,
     editTaskSuccess: false,
     loading: false,
-    contactUseSuccess: false,
     notificationSuccess: null,
     notificationError: null
 };
@@ -122,10 +121,10 @@ export default function reducer(state = defaultState, action) {
         }
 
         case actionTypes.CONTACTUSE: {
-
             return {
                 ...state,
-                contactUseSuccess: true
+                loading: false,
+                notificationSuccess: 'Task edited successfully!!!'
             };
         }
 

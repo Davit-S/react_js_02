@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import {Row, Col, InputGroup, Button, FormControl, DropdownButton, Dropdown } from 'react-bootstrap';
+import { Row, Col, InputGroup, Button, FormControl, DropdownButton, Dropdown } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { formatText } from "../helpers/formatTexts"
+import { formatText, formatDate } from "../helpers/formatTexts";
+import {getTasks} from "../store/actions";
 
 
-export default function SearchTask() {
+function SearchTask() {
 
     const [status, setStatus] = useState('Status');
     const [sort, setSort] = useState('Sort');
@@ -77,9 +78,7 @@ export default function SearchTask() {
         }
     ];
 
-    const handleSubmit = () => {
-        console.log(status, sort, search);
-    }
+
 
     const [dates, setDates] = useState({
         create_lte: null,
@@ -94,6 +93,26 @@ export default function SearchTask() {
             [name]: value
         });
     };
+
+    const handleSubmit = () => {
+
+        let params = {};
+
+        search && (params.search = search);
+        sort.value && (params.sort = sort.value);
+        status.value && (params.status = status.value);
+
+        for (let key in dates) {
+            const value = dates[key];
+            if (value) {
+                const date = formatDate(value.toISOString());
+                params[key] = date;
+            }
+        }
+
+        params = Object.entries(params).map(([key,value])=>`${key}=${value}`).join('&');
+        getTasks(params)
+    }
 
 
     return (
@@ -159,29 +178,31 @@ export default function SearchTask() {
             </InputGroup>
 
             <Row className="mb-5">
-{
-    // col-6 col-md-4
-                dateOptions.map((option, index) => (
-                    <Col md={3}
-                    key={index}>
-                        <span>{option.label} </span>
-                        <DatePicker
-                            selected={dates[option.value]}
-                            onChange={(value) => handleChangeDate(value, option.value)}
-                        />
-                    </Col>
-                ))
-            }
+                {
+                    dateOptions.map((option, index) => (
+                        <Col md={3}
+                            key={index}>
+                            <span>{option.label} </span>
+                            <DatePicker
+                                selected={dates[option.value]}
+                                onChange={(value) => handleChangeDate(value, option.value)}
+                            />
+                        </Col>
+                    ))
+                }
 
             </Row>
 
-            
+
 
         </div>
 
     )
 
-
-
-
 }
+
+const mapDispatchToProps = {
+    getTasks
+  };
+
+export default connect(null, mapDispatchToProps)(SearchTask);

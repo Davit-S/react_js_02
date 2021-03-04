@@ -13,18 +13,18 @@ function Contact(props) {
         "name": "",
         "email": "",
         "message": ""
-    }
+    };
 
     const [stateObj, setValue] = useState(textObject);
     const [errors, setErrors] = useState({
         name: null,
         email: null,
         message: null
-    })
+    });
 
     useEffect(() => {
         inputName.current.focus();
-    }, [])
+    }, []);
 
 
     const formMassage = () => {
@@ -35,7 +35,10 @@ function Contact(props) {
         const valuesExist = !arrayValues.some(el => el === "");
 
         if (valuesExist && !errorsExist) {
-            props.contactUse(JSON.stringify(stateObj))
+
+            props.contactUse(stateObj);
+            setValue(textObject);
+            
 
             // fetch('http://localhost:3001/form', {
             //     method: 'POST',
@@ -142,7 +145,6 @@ function Contact(props) {
                                 name="name"
                                 ref={inputName}
                                 onChange={changeInputValue}
-
                                 value={stateObj.name}
                             />
                             <Form.Text className="text-danger">

@@ -5,9 +5,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { formatDate } from '../helpers/formatTexts';
 import { connect } from 'react-redux';
-import { addTask } from '../store/actions'
-
-
+import { addTask } from '../store/actions';
+import handleKeyDown from '../helpers/handleKeyDown';
 
 class TaskInput extends PureComponent {
 
@@ -28,14 +27,10 @@ class TaskInput extends PureComponent {
 
 
     changeInputValue = (event) => {
-
-        let { name, value } = event.target;
-
+        const { name, value } = event.target;
         this.setState({
             [name]: value
         })
-
-
     };
 
     handleChangeDate = (value) => {
@@ -46,12 +41,10 @@ class TaskInput extends PureComponent {
 
 
     newTaskPush = () => {
-
-        let { taskTitle, taskDescription, date } = this.state
-
+        const { taskTitle, taskDescription, date } = this.state
         if (taskTitle) {
 
-            let newObject = {
+            const newObject = {
                 title: taskTitle,
                 description: taskDescription,
                 date: formatDate(date.toISOString())
@@ -64,13 +57,6 @@ class TaskInput extends PureComponent {
             return
         }
 
-    };
-
-
-    handleKeyDown = (event) => {
-        if (event.key === "Enter") {
-            this.newTaskPush();
-        }
     };
 
     render() {
@@ -95,7 +81,7 @@ class TaskInput extends PureComponent {
                     placeholder="Title"
                     onChange={this.changeInputValue}
                     name='taskTitle'
-                    onKeyPress={this.handleKeyDown}
+                    onKeyPress={(event) => {handleKeyDown(event.key, this.newTaskPush)}}
                     className='mb-3'
                     ref={this.inputTitle}
                 />

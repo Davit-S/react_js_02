@@ -51,9 +51,7 @@ class ToDoList extends PureComponent {
             return;
         }
 
-
-
-    }
+    };
 
 
     ///////////
@@ -183,7 +181,7 @@ class ToDoList extends PureComponent {
 
     render() {
 
-        let { checkboxTask, tasks, editTask } = this.state;
+        let { checkboxTask, editTask } = this.state;
 
         return (
             <div>
@@ -277,7 +275,6 @@ const mapStateToProps = (state) => {
         addTaskSuccess: state.addTaskSuccess,
         deleteTasksSuccess: state.deleteTasksSuccess,
         editTasksSuccess: state.editTasksSuccess
-
     };
 };
 
