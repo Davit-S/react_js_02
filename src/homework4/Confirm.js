@@ -24,7 +24,9 @@ function Confirm(props){
         >
         Delete
         </Button>
-        <Button onClick={props.onCloseConfirm}>Cancel</Button>
+        <Button 
+        onClick={props.onCloseConfirm}>
+          Cancel</Button>
       </Modal.Footer>
     </Modal>
     )

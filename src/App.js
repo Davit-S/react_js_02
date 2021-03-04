@@ -1,20 +1,46 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import ToDoList from './homework4/ToDoList';
-import NavMenu from './homework4/NavMenu'
-import About from './homework4/Pages/About'
-import Contact from './homework4/Pages/Contact'
-import SingleTask from './homework4/Pages/SingleTask'
-import NotFound from './homework4/Pages/NotFound'
+import NavMenu from './homework4/NavMenu';
+import About from './homework4/Pages/About';
+import Contact from './homework4/Pages/Contact';
+import SingleTask from './homework4/Pages/SingleTask';
+import NotFound from './homework4/Pages/NotFound';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
+import { Router, Route, Switch, Redirect } from 'react-router-dom';
+import Spinner from './homework4/Sppiner/Spinner';
+import { connect } from 'react-redux';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import {history} from './homework4/helpers/history';
 
 
-function App() {
+function App({ loading, notificationSuccess, notificationError }) {
+
+  const toastStyle = {
+    position: "bottom-left",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true
+    }
+
+  useEffect(()=>{
+    if(notificationSuccess){
+      toast.success(notificationSuccess, toastStyle);
+    }
+
+    if(notificationError){
+      toast.error(notificationError, toastStyle);
+    }
+
+  }, [notificationSuccess, notificationError]);
+
   return (
     <div className="App">
 
-      <BrowserRouter>
+      <Router history={history}>
         <NavMenu />
 
         <Switch>
@@ -53,16 +79,24 @@ function App() {
         </Switch>
 
 
-      </BrowserRouter>
+      </Router>
 
 
-
-
+      { loading && <Spinner />}
+      <ToastContainer />
 
     </div>
   );
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    loading: state.loading,
+    notificationSuccess: state.notificationSuccess,
+    notificationError: state.notificationError
+    };
+};
+
+export default connect(mapStateToProps)(App);
 
 

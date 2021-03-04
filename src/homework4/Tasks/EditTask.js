@@ -1,12 +1,14 @@
 import React, { PureComponent, createRef } from 'react';
 import { Button, Modal, FormControl } from 'react-bootstrap';
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'; 
 import DatePicker from "react-datepicker";
-import { formatDate } from '../helpers/formatDate';
+import { formatDate } from '../helpers/formatTexts';
+import { editTask } from '../store/actions';
+import {connect} from 'react-redux';
+import handleKeyDown from '../helpers/handleKeyDown';
 
 
-
-export default class EditTask extends PureComponent {
+class EditTask extends PureComponent {
     constructor(props) {
         super(props);
         this.inputEditTitle = createRef();
@@ -44,12 +46,14 @@ export default class EditTask extends PureComponent {
             return;
         }
 
-        this.props.onEditTaskTransfer({
+        const editedTask = {
             _id: this.state._id,
             title,
             description,
             date: formatDate(this.state.date.toISOString())
-        });
+        };
+
+        this.props.editTask(editedTask, this.props.from)
     };
 
 
@@ -76,8 +80,8 @@ export default class EditTask extends PureComponent {
                 <FormControl
                     placeholder="Title"
                     onChange={this.changeInputValue}
+                    onKeyPress={(event) => {handleKeyDown(event.key, this.handleSubmit)}}
                     name='title'
-                    onKeyPress={this.handleKeyDown}
                     className='mb-3'
                     value={title}
                     ref={this.inputEditTitle}
@@ -120,6 +124,10 @@ export default class EditTask extends PureComponent {
 
 EditTask.propTypes = {
     onCloseTask: PropTypes.func.isRequired,
-    onEditTaskTransfer: PropTypes.func.isRequired
 };
 
+const mapDispatchToProps = {
+    editTask
+}
+
+export default connect(null, mapDispatchToProps)(EditTask);
